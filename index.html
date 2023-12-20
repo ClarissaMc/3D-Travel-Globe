@@ -1,0 +1,341 @@
+<html>
+  <head>
+    <style>
+      html, body { 
+        background-color:#000;
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        overflow: hidden !important;  
+      }
+    </style>
+
+    <!-- CSS -->
+    <link href="project.css" rel="stylesheet">
+
+    <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+    <script type="text/javascript" src="https://get.goXTK.com/xtk_xdat.gui.js"></script>
+    <script src="//unpkg.com/globe.gl"></script>
+
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@latest/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@latest/examples/jsm/"
+      }
+    }
+    </script>
+
+    <script type="module">
+
+      import * as THREE from 'three';
+      import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+      import { CSS2DRenderer, CSS2DObject } from 'https://cdn.skypack.dev/three@0.136.0/examples/jsm/renderers/CSS2DRenderer.js';
+
+      var renderer, controls, scene, camera;
+      var city, duration, purpose, other;
+
+      window.onload = function() {
+
+        //localStorage.clear();
+
+        scene = new THREE.Scene();
+
+        // setup the camera
+        var fov = 70;
+        var ratio = window.innerWidth / window.innerHeight;
+        var zNear = 0.01;
+        var zFar = 1000;
+        camera = new THREE.PerspectiveCamera( fov, ratio, zNear, zFar );
+        camera.position.set(0, 10, 0);
+
+        // create renderer and setup the canvas
+        renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize( window.innerWidth, window.innerHeight );
+        document.body.appendChild( renderer.domElement );
+
+        // setup lights
+        var ambientLight = new THREE.AmbientLight();
+        scene.add( ambientLight );
+
+        var light = new THREE.DirectionalLight( 0xffffff, 1 );
+        light.position.set( 5, 3, 5 );
+        scene.add( light );
+
+        // interaction
+        controls = new OrbitControls( camera, renderer.domElement );
+
+
+        // ---------------------- GLOBE --------------------
+
+        // creating globe
+        const globe = Globe();
+
+        // getting world data
+        fetch('data/ne_110m_admin_0_countries.geojson').then(res => res.json()).then(countries => {
+            globe.polygonsData(countries.features.filter(d => d.properties.ISO_A2 !== 'AQ'));
+          });
+
+        globe(document.getElementById('canvas'))
+          .globeImageUrl('images/earth_map.jpg')
+          .backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png')
+          .polygonCapColor(() => 'transparent')
+          .polygonSideColor(() => 'transparent')
+          .polygonStrokeColor(() => '#2d302e')
+          .polygonAltitude(0.001)
+          .polygonLabel(({ properties: d }) => `
+            <b>${d.ADMIN} (${d.ISO_A2})</b>`);
+
+        
+        // --------------------- MARKERS -----------------
+
+        const markerSvg = `<svg xmlns="http://www.w3.org/2000/svg" height="16" width="12" viewBox="0 0 384 512"><path fill="currentColor" d="M32 32C32 14.3 46.3 0 64 0H320c17.7 0 32 14.3 32 32s-14.3 32-32 32H290.5l11.4 148.2c36.7 19.9 65.7 53.2 79.5 94.7l1 3c3.3 9.8 1.6 20.5-4.4 28.8s-15.7 13.3-26 13.3H32c-10.3 0-19.9-4.9-26-13.3s-7.7-19.1-4.4-28.8l1-3c13.8-41.5 42.8-74.8 79.5-94.7L93.5 64H64C46.3 64 32 49.7 32 32zM160 384h64v96c0 17.7-14.3 32-32 32s-32-14.3-32-32V384z"/></svg>`
+        var markers = [];
+        var markers3D = [];
+
+        //retrieve data from local storage, if available
+        let markString = localStorage.getItem("markers");
+        if (markString != null) {
+          markers = JSON.parse(markString);
+
+          globe.htmlElement( d => {
+            const el = document.createElement('div');
+            el.innerHTML = markerSvg;
+            el.style.color = d.color;
+            el.style.width = `${d.size}px`;
+
+            el.style['pointer-events'] = 'auto';
+            el.style.cursor = 'pointer';
+            el.onclick = (e) => {
+              let divCountry = document.getElementById("country");
+              divCountry.innerHTML = `<b>Country: </b>${d.country}`;
+              let divCity = document.getElementById("city");
+              if (d.city != "" && d.city != null) {
+                divCity.innerHTML = `<b>City: </b>${d.city}`;
+              }
+              else {
+                divCity.innerHTML = ``;
+              }
+              let divDuration = document.getElementById("duration");
+              if (d.dur != "" && d.dur != null) {
+                divDuration.innerHTML = `<b>Duration: </b>${d.dur}`;
+              }
+              else {
+                divDuration.innerHTML = ``;
+              }
+              let divPurpose = document.getElementById("purpose");
+              if (d.purp != "" && d.purp != null) {
+                divPurpose.innerHTML = `<b>Purpose: </b>${d.purp}`;
+              }
+              else {
+                divPurpose.innerHTML = ``;
+              }
+              let divOther = document.getElementById("other");
+              if (d.oth != "" && d.oth != null) {
+                divOther.innerHTML = `<b>Other: </b>${d.oth}`;
+              }
+              else {
+                divOther.innerHTML = ``;
+              }
+              label.element.animate([
+                {width: "0px", height: "0px", marginTop: "0px", marginLeft: "0px"},
+                {width: "230px", height: "100px", marginTop: "-25px", marginLeft: "120px"}],
+                { duration: 250 });
+              label.element.classList.remove("hidden");
+              var pos = el.getBoundingClientRect();
+              scene.add(label);
+            };
+            return el;
+          });
+          globe.htmlElementsData(markers);
+        }
+        let mark3DString = localStorage.getItem("markers3D");
+        if (mark3DString != null) {
+          let markerGeo = new THREE.SphereGeometry(3, 32, 16);
+          let markerMesh = new THREE.MeshBasicMaterial( {color: 0xffff00} );
+          let marker3D = new THREE.Mesh( markerGeo, markerMesh );
+          marker3D.visible = false;
+          globe.objectThreeObject(marker3D);
+          markers3D = JSON.parse(mark3DString);
+          globe.objectsData(markers3D);
+        }
+
+        // placing html marker
+        globe.onPolygonClick( function(polygon, event, {lat, lng, altitude}) {
+          markers.push({
+            lat: lat,
+            lng: lng,
+            size: 13,
+            color: params.markerColor,
+            country: polygon.properties.ADMIN,
+            id: markers.length,
+            city: city,
+            dur: duration,
+            purp: purpose,
+            oth: other
+          });
+          globe.htmlElementsData(markers);
+          localStorage.setItem("markers", JSON.stringify(markers));
+
+          //place invisible 3d marker (for pop-up)
+          let markerGeo = new THREE.SphereGeometry(3, 32, 16);
+          let markerMesh = new THREE.MeshBasicMaterial( {color: 0xffff00} );
+          let marker3D = new THREE.Mesh( markerGeo, markerMesh );
+          marker3D.visible = false;
+          markers3D.push({
+            lat: lat,
+            lng: lng,
+            size: 3,
+            alt: altitude,
+            country: polygon.properties.ADMIN,
+            obj: marker3D
+          });
+          globe.objectThreeObject(marker3D);
+          globe.objectsData(markers3D);
+          localStorage.setItem("markers3D", JSON.stringify(markers3D));
+
+
+          // creating pushpin icon & pop-up elements
+          globe.htmlElement( d => {
+            const el = document.createElement('div');
+            el.innerHTML = markerSvg;
+            el.style.color = d.color;
+            el.style.width = `${d.size}px`;
+
+            el.style['pointer-events'] = 'auto';
+            el.style.cursor = 'pointer';
+            el.onclick = (e) => {
+              let divCountry = document.getElementById("country");
+              divCountry.innerHTML = `<b>Country: </b>${d.country}`;
+              let divCity = document.getElementById("city");
+              if (d.city != "" && d.city != null) {
+                divCity.innerHTML = `<b>City: </b>${d.city}`;
+              }
+              else {
+                divCity.innerHTML = ``;
+              }
+              let divDuration = document.getElementById("duration");
+              if (d.dur != "" && d.dur != null) {
+                divDuration.innerHTML = `<b>Duration: </b>${d.dur}`;
+              }
+              else {
+                divDuration.innerHTML = ``;
+              }
+              let divPurpose = document.getElementById("purpose");
+              if (d.purp != "" && d.purp != null) {
+                divPurpose.innerHTML = `<b>Purpose: </b>${d.purp}`;
+              }
+              else {
+                divPurpose.innerHTML = ``;
+              }
+              let divOther = document.getElementById("other");
+              if (d.oth != "" && d.oth != null) {
+                divOther.innerHTML = `<b>Other: </b>${d.oth}`;
+              }
+              else {
+                divOther.innerHTML = ``;
+              }
+              label.element.animate([
+                {width: "0px", height: "0px", marginTop: "0px", marginLeft: "0px"},
+                {width: "230px", height: "100px", marginTop: "-25px", marginLeft: "120px"}],
+                { duration: 250 });
+              label.element.classList.remove("hidden");
+              var pos = el.getBoundingClientRect();
+              scene.add(label);
+            };
+            return el;
+          });
+        });
+
+
+        // removing marker
+        globe.onObjectRightClick(function(obj, event, {lat, lng, altitude}) {
+          for (let i = 0; i < markers3D.length; i++) {
+            // found marker - delete it
+              if (markers3D[i].obj.object.uuid == obj.obj.object.uuid) {
+              var temp3D = markers3D.splice(i, 1);
+              var temp = markers.splice(i, 1);
+              globe.objectsData(markers3D);
+              globe.htmlElementsData(markers);
+              break;
+            }
+          }
+          // also delete it from local storage
+          window.localStorage.setItem('markers', JSON.stringify(markers));
+          window.localStorage.setItem('markers3D', JSON.stringify(markers3D));
+        });
+
+
+        // adding pop-up
+        let labelRenderer = new CSS2DRenderer();
+        labelRenderer.setSize( window.innerWidth, window.innerHeight );
+        labelRenderer.domElement.style.position = 'absolute';
+        labelRenderer.domElement.style.top = '0px';
+        //labelRenderer.domElement.style.backgroundColor = 'white';
+        labelRenderer.domElement.style['pointer-events'] = "none";
+        document.body.appendChild( labelRenderer.domElement );
+
+        let labelDiv = document.getElementById("markerLabel");
+        let closeBtn = document.getElementById("closeButton");
+        closeBtn.addEventListener("pointerdown", event => {
+          labelDiv.classList.add("hidden");
+        });
+        let label = new CSS2DObject(labelDiv);
+        label.position.set(1, 0, -2);
+
+
+        // ----------------------- UI --------------------
+
+        var params = {
+          markerColor: 0x000,
+          city: "",
+          duration: "",
+          purpose: "",
+          other: ""
+        };
+
+        // GUI
+        var gui = new dat.GUI();
+        var markerGUI = gui.addFolder('Markers');
+        // changing color of markers
+        markerGUI.addColor(params, 'markerColor').onChange( function(value) {
+          var newColor = value.toString(16);
+          params.markerColor = newColor;
+        });
+        markerGUI.add(params, 'city').onChange( function(value) { city = value; });
+        markerGUI.add(params, 'duration').onChange( function(value) { duration = value; });
+        markerGUI.add(params, 'purpose').onChange( function(value) { purpose = value; });
+        markerGUI.add(params, 'other').onChange( function(value) { other = value; });
+        markerGUI.open();
+        
+
+        // call animation/rendering loop
+        animate();
+
+        function animate() {
+
+          requestAnimationFrame( animate );
+
+          controls.update();
+          labelRenderer.render( scene, camera );
+          renderer.render( scene, camera );
+
+        };
+        
+      };
+
+    </script>
+  </head>
+  <body>
+    <div id="markerLabel" class="hidden">
+      <button id="closeButton">X</button>
+      <div class="text" id="country"></div>
+      <div class="text" id="city"></div>
+      <div class="text" id="duration"></div>
+      <div class="text" id="purpose"></div>
+      <div class="text" id="other"></div>
+    </div>
+    <div id="canvas"></div>
+    <div id="info">Click a country to place a marker.<br/>Click a marker to get see its data!<br/>Right click a marker to delete it.</div>
+  </body>
+</html>
