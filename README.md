@@ -3,7 +3,9 @@
 
 Are you a fellow globe-trotter who loves to look back at past travels? Or perhaps you want to bookmark all the places you aspire to vist one day? Well, this 3D Travel Globe has got you covered!
 
-This project allows you to interact with a 3D globe and place markers to visually represent your past, present, and future travel destinations. Features include:
+This project allows you to interact with a 3D globe and place markers to visually represent your past, present, and future travel destinations.
+
+<h3>Features</h3>
 <ul>
   <li>Fully customizable markers! Use different colors to represent different members of a household or to differentiate between past vacations and those still on your bucket list.</li>
   <li>Information input for each marker</li>
@@ -13,7 +15,8 @@ This project allows you to interact with a 3D globe and place markers to visuall
   <li>All of this, right in the comfort of your own browser!</li>
 </ul>
 
-To use this app, all you need to do is visit the GitHub Page: <br/>
+<h3>How to Use</h3>
+To use this app, all you need to do is visit the <a href="https://clarissamc.github.io/3D-Travel-Globe/">GitHub Page</a>.
 <ul>
   <li>To place a marker, click on a country on the globe.</li>
   <li>If you want to input information for a marker, enter it in the GUI on the right-hand side of the screen <b>BEFORE</b> placing the marker! Each field is completely optional. :)</li>
