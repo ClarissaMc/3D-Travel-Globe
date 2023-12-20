@@ -1,4 +1,6 @@
 # 3D-Travel-Globe
+A project by Clarissa McCarthy for <a href="https://cs460.org/">CS 460</a>
+
 ![SS2](https://github.com/ClarissaMc/3D-Travel-Globe/assets/129700131/1c91c36a-3269-4315-963b-6330f25bb3a1)
 
 Are you a fellow globe-trotter who loves to look back at past travels? Or perhaps you want to bookmark all the places you aspire to vist one day? Well, this 3D Travel Globe has got you covered!
