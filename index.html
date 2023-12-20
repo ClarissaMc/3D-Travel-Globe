@@ -251,13 +251,33 @@
         // removing marker
         globe.onObjectRightClick(function(obj, event, {lat, lng, altitude}) {
           for (let i = 0; i < markers3D.length; i++) {
-            // found marker - delete it
+            // if marker found - delete it
+            if (obj.obj.object != null) {
               if (markers3D[i].obj.object.uuid == obj.obj.object.uuid) {
-              var temp3D = markers3D.splice(i, 1);
-              var temp = markers.splice(i, 1);
-              globe.objectsData(markers3D);
-              globe.htmlElementsData(markers);
-              break;
+                var temp3D = markers3D.splice(i, 1);
+                var temp = markers.splice(i, 1);
+                globe.objectsData(markers3D);
+                globe.htmlElementsData(markers);
+                break;
+              }
+            }
+            else if (markers3D[i].obj.object != null) {
+              if (markers3D[i].obj.object.uuid == obj.obj.uuid) {
+                var temp3D = markers3D.splice(i, 1);
+                var temp = markers.splice(i, 1);
+                globe.objectsData(markers3D);
+                globe.htmlElementsData(markers);
+                break;
+              }
+            }
+            else {
+              if (markers3D[i].obj.uuid == obj.obj.uuid) {
+                var temp3D = markers3D.splice(i, 1);
+                var temp = markers.splice(i, 1);
+                globe.objectsData(markers3D);
+                globe.htmlElementsData(markers);
+                break;
+              }
             }
           }
           // also delete it from local storage
