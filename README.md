@@ -29,6 +29,7 @@ This project uses your local storage to seemlessly save your globe for future re
 This project wouldn't have been possible without these excellent resources. Please check them out!
 <ul>
   <li><a href="https://globe.gl/">Globe.GL</a> for the core mechanics of the globe.</li>
+  <li><a href="https://www.shadedrelief.com/natural3/pages/textures.html">shadedrelief</a> for the globe image.</li>
   <li><a href="https://github.com/nvkelso/natural-earth-vector/blob/master/geojson/ne_110m_admin_0_countries.geojson?short_path=1e6ab74">nvkelso</a> for the geoJSON data.</li>
   <li><a href="https://discourse.threejs.org/t/globe-with-markers-and-label-thoughts-ideas-approaches-solutions/34995">prisoner849</a> for the pop-up label code and CSS.</li>
   <li><a href="https://github.com/dataarts/dat.gui">dat.GUI</a> for the UI interface.</li>
