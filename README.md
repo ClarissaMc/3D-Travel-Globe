@@ -19,11 +19,11 @@ This project allows you to interact with a 3D globe and place markers to visuall
 To use this app, all you need to do is visit the <a href="https://clarissamc.github.io/3D-Travel-Globe/">GitHub Page</a>.
 <ul>
   <li>To place a marker, click on a country on the globe.</li>
-  <li>If you want to input information for a marker, enter it in the GUI on the right-hand side of the screen <b>BEFORE</b> placing the marker! Each field is completely optional. :)</li>
+  <li>If you want to input information for a marker, enter it in the GUI on the right-hand side of the screen <b>BEFORE</b> placing the marker! Each field is completely optional. : )</li>
   <li>To delete a marker, simply right click it.</li>
 </ul>
 
-This project uses your local storage to seemlessly save your globe for future reference and modifications. If you have trouble saving your data, make sure to check your cookie settings. :)
+This project uses your local storage to seemlessly save your globe for future reference and modifications. If you have trouble saving your data, make sure to check your cookie settings. : )
 
 <h3>Credits</h3>
 This project wouldn't have been possible without these excellent resources. Please check them out!
